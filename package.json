@@ -25,6 +25,7 @@
     "eslint": "^7.32.0"
   },
   "dependencies": {
-    "@bdsx/bdsx-placeholderapi": "^1.0.2"
+    "@bdsx/bdsx-placeholderapi": "^1.0.2",
+    "generate-password": "^1.7.0"
   }
 }
