@@ -196,7 +196,7 @@ export function leaveRoom(xuid: string, callback: (room: Room | null) => void) {
     if (room == null) return callback(null);
 
     if (room?.room.owner.xuid == xuid) {
-        if (room.room.members.length == 0) return disolveRoom(xuid);
+        if (room.room.members.length == 0) return dissolveRoom(xuid);
         const member: RoomMember = room.room.members[0];
         rooms[room.index].owner = member;
         rooms[room.index].members.splice(0, 1);
@@ -211,13 +211,13 @@ export function leaveRoom(xuid: string, callback: (room: Room | null) => void) {
     callback(room?.room);
 }
 
-export function disolveRoom(xuid: string) {
+export function dissolveRoom(xuid: string) {
     const player: ServerPlayer = <ServerPlayer>level.getPlayerByXuid(xuid);
     const room = findRoomByXuid(xuid);
     if (room == null) return player?.sendMessage('§cYou\'re not in a room');
-    if (room.room.owner.xuid != xuid) return player?.sendMessage('§cYou need to be the owner to disolve the room');
+    if (room.room.owner.xuid != xuid) return player?.sendMessage('§cYou need to be the owner to dissolve the room');
     rooms.splice(room?.index!, 1);
-    player?.sendMessage('§eRoom disolved');
+    player?.sendMessage('§eRoom dissolved');
 }
 
 export function getMentions(text: string): string[] {

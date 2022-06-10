@@ -7,7 +7,7 @@
  * |____/ \___|\__|\__\___|_|   \_____|_| |_|\__,_|\__|
  * By: RedTNT
  */
-import { Configuration, createRoom, disolveRoom, findRoomByXuid, getMentions, getTime, joinRoom, parse, rooms, Room, RoomMember, sendActionbar, sendMC, sleepCount, version, leaveRoom } from "./lib/utils";
+import { Configuration, createRoom, dissolveRoom, findRoomByXuid, getMentions, getTime, joinRoom, parse, rooms, Room, RoomMember, sendActionbar, sendMC, sleepCount, version, leaveRoom } from "./lib/utils";
 import { PlayerJoinEvent, PlayerLeftEvent, PlayerSleepInBedEvent } from "bdsx/event_impl/entityevent";
 import { registerPlaceholder, setPlaceholders } from "@bdsx/bdsx-placeholderapi";
 import { Certificate, ConnectionRequest } from "bdsx/bds/connreq";
@@ -19,12 +19,12 @@ import { NetworkIdentifier } from "bdsx/bds/networkidentifier";
 import { serverProperties } from "bdsx/serverproperties";
 import { ServerInstance } from "bdsx/bds/server";
 import { bedrockServer } from "bdsx/launcher";
+import { CxxString } from "bdsx/nativetype";
 import { command } from "bdsx/command";
 import { CANCEL } from "bdsx/common";
 import { events } from "bdsx/event";
 import { Level } from "bdsx/bds/level";
 import { Color } from "colors";
-import { CxxString } from "bdsx/nativetype";
 
 const history: { author: string; content: string }[] = [];
 const cooldown = new Map<string, NodeJS.Timeout>();
@@ -85,16 +85,16 @@ events.serverOpen.on(() => {
         access: [command.enum('AccessType', 'private', 'public'), true]
     });
 
-    // bchat room disolve
+    // bchat room dissolve
     cmd.overload(async (_param, origin, _output) => {
         if (origin.isServerCommandOrigin()) return console.log('This command can only be executed by players'.red);
         const player: ServerPlayer = <ServerPlayer>origin.getEntity();
         const xuid: string = player.getXuid();
 
-        disolveRoom(xuid);
+        dissolveRoom(xuid);
     }, {
         room: command.enum('option.action', 'room'),
-        disolve: command.enum('option.disolve', 'disolve')
+        dissolve: command.enum('option.dissolve', 'dissolve')
     });
 
     // bchat room join
@@ -299,6 +299,7 @@ events.playerJoin.on((event: PlayerJoinEvent) => {
     player.playSound(config.welcome.sound);
 });
 
+// Player join message:
 events.packetAfter(MinecraftPacketIds.Login).on((packet: LoginPacket, netId: NetworkIdentifier) => {
     const address: string = netId.getAddress().split('|')[0];
     const connreq: ConnectionRequest | null = packet.connreq;
@@ -317,6 +318,23 @@ events.packetAfter(MinecraftPacketIds.Login).on((packet: LoginPacket, netId: Net
     );
 });
 
+// Sleep message:
+events.playerSleepInBed.on(async (event: PlayerSleepInBedEvent) => {
+    const player: Player = event.player;
+    setTimeout(() => {
+        if (!player.isSleeping()) return;
+        sendMC(setPlaceholders(config.playerSleep.chat, player));
+
+        // Sleep actionbar message:
+        const interval: NodeJS.Timeout = setInterval(() => {
+            if (sleepCount() == 0) return clearInterval(interval);
+            if (config.playerSleep.actionbar.trim().length != 0)
+                sendActionbar(setPlaceholders(config.playerSleep.actionbar, player));
+        }, 500);
+    }, 100);
+});
+
+// Player left message:
 events.playerLeft.on((event: PlayerLeftEvent) => {
     const player: ServerPlayer = event.player;
     const xuid: string = player.getXuid();
@@ -338,24 +356,9 @@ events.playerLeft.on((event: PlayerLeftEvent) => {
     );
 });
 
-// Sleep message:
-events.playerSleepInBed.on(async (event: PlayerSleepInBedEvent) => {
-    const player: Player = event.player;
-    setTimeout(() => {
-        if (!player.isSleeping()) return;
-        sendMC(setPlaceholders(config.playerSleep.chat, player));
-
-        // Sleep actionbar message:
-        const interval: NodeJS.Timeout = setInterval(() => {
-            if (sleepCount() == 0) return clearInterval(interval);
-            if (config.playerSleep.actionbar.trim().length != 0)
-                sendActionbar(setPlaceholders(config.playerSleep.actionbar, player));
-        }, 500);
-    }, 100);
-});
-
+// Clean console:
 events.serverLog.on((log: string, color: Color) => {
-    log = log.replace(/\[([^]+)\]/, `[${getTime()}]`.grey).replace('NO LOG FILE! - ', '');
+    log = log.replace('NO LOG FILE! - ', '').replace(/\[([^]+)\]/, `[${getTime()}]`.grey);
     if (/[a-z]/.exec(log[0])) log = log[0].toUpperCase() + log.slice(1);
 
     if (!/Player (connected|disconnected)|Running AutoCompaction/.exec(log))
