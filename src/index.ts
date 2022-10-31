@@ -31,6 +31,7 @@ const cooldown = new Map<string, NodeJS.Timeout>();
 const mute = new Map<string, NodeJS.Timeout>();
 const addresses = new Map<string, string>();
 const spam = new Map<string, string[]>();
+
 export let config: Configuration = parse();
 export let serverInstance: ServerInstance;
 export let level: Level;
@@ -274,23 +275,22 @@ registerPlaceholder('sleep_count', (_player: ServerPlayer): string => {
 events.packetSend(MinecraftPacketIds.Text).on((packet: TextPacket, netId: NetworkIdentifier) => {
     if (packet.type !== TextPacket.Types.Translate) return;
 
-    if (/join|left|bed/.exec(packet.message)) return CANCEL;
+    if (/join|left|sleeping/.exec(packet.message)) return CANCEL;
 });
 
 events.playerJoin.on((event: PlayerJoinEvent) => {
     const player: ServerPlayer = event.player;
-    const address: string = player.getNetworkIdentifier().getAddress().split('|')[0];
-    const xuid: string = player.getXuid();
     const pos = player.getPosition();
 
-    // Save address:
-    addresses.set(xuid, address);
+    // Messages history:
+    if (config.messageHistory.enabled) history.forEach((value) => player.sendChat(value.content, value.author));
 
     // Anti-Spam stuff:
     spam.set(player.getXuid(), []);
 
     // Join message:
     sendMC(setPlaceholders(config.playerJoin, player));
+
     // Console join message:
     console.log(`[${getTime()}]`.grey, 'Player connected:'.green, player.getName().yellow, 'Coords:'.green, `${Math.floor(pos.x)} ${Math.floor(pos.y)} ${Math.floor(pos.z)}`.yellow);
 
@@ -308,6 +308,9 @@ events.packetAfter(MinecraftPacketIds.Login).on((packet: LoginPacket, netId: Net
     const cert: Certificate = connreq.getCertificate();
     const xuid: string = cert.getXuid();
     const name = cert.getId();
+    
+    // Save address:
+    addresses.set(xuid, address);
 
     // Console connecting message:
     console.log(
@@ -338,7 +341,7 @@ events.playerSleepInBed.on(async (event: PlayerSleepInBedEvent) => {
 events.playerLeft.on((event: PlayerLeftEvent) => {
     const player: ServerPlayer = event.player;
     const xuid: string = player.getXuid();
-    const address: string = addresses.get(xuid)!
+    const address: string = addresses.get(xuid)!;
     const pos = player.getPosition();
 
     // Left room:
@@ -349,9 +352,9 @@ events.playerLeft.on((event: PlayerLeftEvent) => {
     // Console left message:
     console.log(
         `[${getTime()}]`.grey,
-        'Player disconnected:'.green, player.getName().yellow,
-        'Ip:'.green, address.yellow,
-        'Xuid:'.green, player.getXuid().yellow,
+        'Player disconnected:'.green, player.getName()?.yellow,
+        'Ip:'.green, address?.yellow,
+        'Xuid:'.green, player.getXuid()?.yellow,
         'Coords:'.green, `${Math.floor(pos.x)} ${Math.floor(pos.y)} ${Math.floor(pos.z)}`.yellow
     );
 });

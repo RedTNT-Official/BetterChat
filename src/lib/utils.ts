@@ -10,10 +10,10 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { setPlaceholders } from "@bdsx/bdsx-placeholderapi"
 import { bedrockServer } from "bdsx/launcher";
+import { level, config } from "..";
 import { ServerPlayer } from "bdsx/bds/player";
 import { generate } from "generate-password";
 import { join } from "path";
-import { level, config } from "..";
 
 const configPath: string = join(process.cwd(), '..', 'config');
 const path: string = join(configPath, 'BetterChat');
@@ -36,8 +36,8 @@ const defaultConfig: Configuration = {
         seconds: 10,
         limit: 3
     },
-    playerJoin: '§7[§a+§7] §8%player_name%',
-    playerLeft: '§7[§c-§7] §8%player_name%',
+    playerJoin: "§7[§a+§7] §8%player_name%",
+    playerLeft: "§7[§c-§7] §8%player_name%",
     playerSleep: {
         chat: '§b%player_name% is sleeping...',
         actionbar: '§aThere are §6%sleep_count% §asleeping players'
@@ -69,7 +69,7 @@ export function parse(): Configuration {
     try {
         return JSON.parse(readFileSync(file, 'utf8'));
     } catch (e) {
-        console.log('[BetterChat] There\'s an error with the config file. Will use default configuration.'.bgRed);
+        console.log("[BetterChat] There's an error with the config file. Will use default configuration.".bgRed);
         return defaultConfig;
     }
 }
@@ -147,7 +147,7 @@ export function createRoom(xuid: string, access: 'private' | 'public' = 'public'
         rooms.push({
             access: 'public',
             owner: {
-                username: player.getName(),
+                username: player.getNameTag(),
                 xuid: xuid
             },
             members: []
@@ -165,7 +165,7 @@ export function createRoom(xuid: string, access: 'private' | 'public' = 'public'
             access: 'private',
             code: code,
             owner: {
-                username: player.getName(),
+                username: player.getNameTag(),
                 xuid: xuid
             },
             members: []
@@ -184,7 +184,7 @@ export function joinRoom(options: { xuid: string; ownerXuid?: string; code?: str
 
     if (findRoomByXuid(options.xuid) != null) leaveRoom(options.xuid, () => { });
     rooms[room?.index!].members.push({
-        username: player.getName(),
+        username: player.getNameTag(),
         xuid: options.xuid
     });
     callback(room?.room, owner, false);
