@@ -1,15 +1,10 @@
 {
   "name": "@bdsx/betterchat",
-  "version": "1.1.6",
+  "version": "1.1.8",
   "description": "",
-  "main": "src/index.js",
+  "main": "index.js",
   "keywords": [],
-  "author": "RedTNT",
-  "homepage": "https://discord.gg/xjKrKwkqDs",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/RedTNT-Official/BetterChat"
-  },
+  "author": "",
   "license": "ISC",
   "bdsxPlugin": true,
   "scripts": {
@@ -19,13 +14,13 @@
   },
   "devDependencies": {
     "@types/node": "^12.20.36",
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.33.0",
-    "bdsx": "file:../bdsx",
-    "eslint": "^7.32.0"
+    "@typescript-eslint/eslint-plugin": "^5.48.1",
+    "@typescript-eslint/parser": "^5.48.1",
+    "bdsx": "file:../../bdsx",
+    "eslint": "^8.31.0"
   },
   "dependencies": {
     "@bdsx/bdsx-placeholderapi": "^1.0.2",
-    "generate-password": "^1.7.0"
+    "generate-password": "^1.7.1"
   }
 }
