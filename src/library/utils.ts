@@ -29,7 +29,7 @@ function fill(number: number): string {
 }
 
 export interface PluginConfig {
-    version: number;
+    version: string;
     logInConsole: boolean;
 
     chat: {
@@ -71,6 +71,57 @@ export interface PluginConfig {
             custom: boolean;
             interval: number;
             values: string[];
+        }
+    }
+}
+
+export const defaultConfig: PluginConfig = {
+    version: '1.10.0',
+    logInConsole: true,
+
+    chat: {
+        playerMessage: '<%player_name%> %message%',
+        cooldown: 0,
+        maxLength: 0,
+        maxHistory: 30,
+        antiSpam: false,
+        mentionSound: 'random.orb'
+    },
+    
+    broadcast: {
+        playerJoin: "§7[§a+§7] §8%player_name%",
+        playerLeft: "§7[§c-§7] §8%player_name%",
+        playerSleep: {
+            chat: '§b%player_name% is sleeping...',
+            actionbar: '§aThere are §6%sleep_count% §asleeping players'
+        },
+        welcome: {
+            chat: '§aWelcome to server %player_name%!',
+            title: '',
+            subtitle: '',
+            sound: 'random.levelup'
+        }
+    },
+
+    room: {
+        playerJoin: '§7[§e+ §dRoom§7]§r %player_name%',
+        playerLeft: '§7[§4- §dRoom§7]§r %player_name%',
+        chat: '§8[§dRoom§8] §7<§r%player_name%§7>§r %message%',
+        welcome: {
+            message: `Welcome to this room!`,
+            sound: 'random.levelup'
+        },
+    },
+
+    extras: {
+        MOTD: {
+            custom: true,
+            interval: 5,
+            values: [
+                'BetterChat BDSX',
+                'My server',
+                'Made by RedTNT'
+            ]
         }
     }
 }

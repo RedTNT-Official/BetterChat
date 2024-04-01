@@ -6,10 +6,12 @@ export const pluginDir = join(__dirname, '../..');
 
 export class Configuration<T>{
     private path: string;
+    defaultData?: T;
     data: T;
 
-    constructor(filename: string) {
+    constructor(filename: string, defaultData?: T) {
         this.path = join(dataDir, filename);
+        this.defaultData = defaultData;
     }
 
     get version(): string {
@@ -24,10 +26,11 @@ export class Configuration<T>{
     }
 
     read(): T {
-        if (!existsSync(dataDir)) this.write({});
+        if (!existsSync(this.path)) this.write(this.defaultData ?? {});
 
         return this.data = JSON.parse(readFileSync(this.path, 'utf-8'));
     }
+
     write(data: any) {
         if (!existsSync(dataDir)) mkdirSync(dataDir);
         writeFileSync(this.path, JSON.stringify(data));

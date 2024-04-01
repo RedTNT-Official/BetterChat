@@ -7,8 +7,8 @@
  * |____/ \___|\__|\__\___|_|   \_____|_| |_|\__,_|\__|
  *  By: RedTNT
  */
+import { PluginConfig, broadcast, defaultConfig, getMentions, getTime } from "./library/utils";
 import { registerPlaceholder, setPlaceholders } from "@bdsx/bdsx-placeholderapi";
-import { PluginConfig, broadcast, getMentions, getTime } from "./library/utils";
 import { MinecraftPacketIds } from "bdsx/bds/packetids";
 import { Configuration } from "./library/loader";
 import { bedrockServer } from "bdsx/launcher";
@@ -22,7 +22,7 @@ import { events } from "bdsx/event";
 import { Color } from "colors";
 import { Mute } from "./modules/Mute";
 
-export const configuration = new Configuration<PluginConfig>('configuration.json');
+export const configuration = new Configuration<PluginConfig>('configuration.json', defaultConfig);
 const ipAddress = new Map<string, string>();
 
 events.packetBefore(MinecraftPacketIds.Text).on((packet, netId) => {
@@ -96,7 +96,7 @@ events.packetBefore(MinecraftPacketIds.Text).on((packet, netId) => {
 });
 
 events.playerJoin.on(({ player }) => {
-    const config = configuration.data;
+    const config = configuration.read();
     const pos = player.getPosition();
     const history = new ChatHistory(config.chat.maxHistory);
 
@@ -143,7 +143,7 @@ events.playerSleepInBed.on(async ({ player }) => {
     setTimeout(() => {
         if (!player.isSleeping()) return;
 
-        const { playerSleep } = configuration.data.broadcast;
+        const { playerSleep } = configuration.read().broadcast;
         if (playerSleep.chat.trim().length > 0) broadcast(setPlaceholders(playerSleep.chat, player));
 
         // Sleep actionbar message:
@@ -164,7 +164,7 @@ events.playerLeft.on((event) => {
     const address: string = ipAddress.get(xuid)!;
     const pos = player.getPosition();
 
-    const { playerLeft } = configuration.data.broadcast;
+    const { playerLeft } = configuration.read().broadcast;
     // Left room:
     const room = ChatRoom.find(player);
     room?.leave(player);
@@ -187,7 +187,7 @@ events.packetSend(MinecraftPacketIds.Text).on((packet) => {
 });
 
 events.serverOpen.on(() => {
-    const { version } = configuration.data;
+    const { version } = configuration.read();
     console.log(`BetterChat BDSX v${version}`.cyan, '- by: RedTNT');
 
     import("./commands/bchat/bchat");
