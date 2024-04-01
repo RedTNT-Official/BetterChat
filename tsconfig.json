@@ -6,6 +6,8 @@
     ],
     "module": "CommonJS",
     "moduleResolution": "Node",
+    "rootDir": "./src",
+    "outDir": "./dist",
     "alwaysStrict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,

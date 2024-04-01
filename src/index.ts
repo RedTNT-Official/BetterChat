@@ -27,7 +27,7 @@ const ipAddress = new Map<string, string>();
 
 events.packetBefore(MinecraftPacketIds.Text).on((packet, netId) => {
     const player = netId.getActor()!;
-    const config = configuration.data;
+    const config = configuration.read();
 
     const level = bedrockServer.level;
 
