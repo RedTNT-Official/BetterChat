@@ -9,7 +9,7 @@ export function askPassword(player: ServerPlayer, creating: boolean = false): Pr
         const netID = player.getNetworkIdentifier();
     
         const form = new CustomForm('Create Form');
-        form.addComponent(new FormInput(`Enter the${creating ? ' new ' : ''}room password`));
+        form.addComponent(new FormInput(`Enter the${creating ? ' new ' : ' '}room password`));
         form.sendTo(netID, async (data) => {
             const response: string = data.response;
             if (/[A-z]/g.exec(response.trim())) return resolve(response);

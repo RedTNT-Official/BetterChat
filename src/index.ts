@@ -10,7 +10,7 @@
 import { PluginConfig, broadcast, defaultConfig, getMentions, getTime } from "./library/utils";
 import { registerPlaceholder, setPlaceholders } from "@bdsx/bdsx-placeholderapi";
 import { MinecraftPacketIds } from "bdsx/bds/packetids";
-import { Configuration } from "./library/loader";
+import { Configuration, loadCommands } from "./library/loader";
 import { bedrockServer } from "bdsx/launcher";
 import { ChatHistory } from "./modules/History";
 import { TextPacket } from "bdsx/bds/packets";
@@ -190,7 +190,7 @@ events.serverOpen.on(() => {
     const { version } = configuration.read();
     console.log(`BetterChat BDSX v${version}`.cyan, '- by: RedTNT');
 
-    import("./commands/bchat/bchat");
+    loadCommands();
 });
 
 events.serverLog.on((log: string, color: Color) => {

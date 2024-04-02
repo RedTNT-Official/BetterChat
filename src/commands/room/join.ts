@@ -1,11 +1,11 @@
 import { ChatRoom, askPassword, confirmLeave } from "../../modules/ChatRoom";
 import { FormButton, SimpleForm } from "bdsx/bds/form";
 import { CommandOriginType } from "bdsx/bds/commandorigin";
+import { setPlaceholders } from "@bdsx/bdsx-placeholderapi";
+import { configuration } from "../..";
 import { ServerPlayer } from "bdsx/bds/player";
 import { command } from "bdsx/command";
 import cmd from "./room";
-import { setPlaceholders } from "@bdsx/bdsx-placeholderapi";
-import { configuration } from "../..";
 
 cmd.overload((_, origin, out) => {
     if (origin.getOriginType() !== CommandOriginType.Player) return out.error('This command can only be executed by players.');
@@ -18,7 +18,7 @@ cmd.overload((_, origin, out) => {
     rooms.forEach(r => form.addButton(new FormButton(r.name)));
 
     form.sendTo(player.getNetworkIdentifier(), async ({ response }) => {
-        if (response === null) return;
+        if (!response) return;
 
         const room = rooms[response];
         if (!room.isValid()) return player.sendMessage('§cRoom no longer exists.');

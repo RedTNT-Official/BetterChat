@@ -14,23 +14,21 @@ cmd.overload((_, origin, out) => {
     create: command.enum('option.create', 'create')
 });
 
-function createRoom(player: ServerPlayer): Promise<ChatRoom> {
-    return new Promise((resolve) => {
-        const netID = player.getNetworkIdentifier();
-    
-        const form = new CustomForm('Create Room');
-        form.addComponent(new FormInput('Enter room name', 'Creeper Team'));
-        form.addComponent(new FormToggle('Private', false));
-        
-        form.sendTo(netID, async (data) => {
-            console.log(data);
-            const response: [string, boolean] = data.response;
-            const access = response[1] ? 'private' : 'public';
-    
-            const password = access === 'private' ? await askPassword(player, true) : undefined;
-            const room = new ChatRoom(player, response[0], access, password);
+async function createRoom(player: ServerPlayer) {
+    const netID = player.getNetworkIdentifier();
 
-            player.sendMessage(`§aRoom "${room.name}" has been created.`);
-        });
+    const form = new CustomForm('Create Room');
+    form.addComponent(new FormInput('Enter room name', 'Creeper Team'));
+    form.addComponent(new FormToggle('Private', false));
+
+    form.sendTo(netID, async (data) => {
+        console.log(data);
+        const response: [string, boolean] = data.response;
+        const access = response[1] ? 'private' : 'public';
+
+        const password = access === 'private' ? await askPassword(player, true) : undefined;
+        const room = new ChatRoom(player, response[0], access, password);
+
+        player.sendMessage(`§aRoom "${room.name}" has been created.`);
     });
 }
