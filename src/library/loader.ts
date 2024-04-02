@@ -53,9 +53,10 @@ export async function loadFiles(dirname: string) {
             loadFiles(join(dirname, file));
             continue;
         }
-
+        
+        if (file.endsWith('.ts')) continue;
         try {
-            await import(`./${dirname}/${file}`);
+            await import(join(path, file));
             console.log("Loaded".yellow, file.magenta);
         } catch (e) {
             console.error(e);

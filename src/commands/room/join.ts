@@ -15,7 +15,7 @@ cmd.overload((_, origin, out) => {
 
     const form = new SimpleForm('Chat Rooms');
     form.setContent('Choose a chat room to join:');
-    rooms.forEach(r => form.addButton(new FormButton(r.name)));
+    rooms.forEach(r => form.addButton(new FormButton(`${r.name}\nOwner: ${r.owner.name}`)));
 
     form.sendTo(player.getNetworkIdentifier(), async ({ response }) => {
         if (!response) return;
@@ -23,13 +23,13 @@ cmd.overload((_, origin, out) => {
         const room = rooms[response];
         if (!room.isValid()) return player.sendMessage('§cRoom no longer exists.');
 
-        if (room.access === "private") {
+        if (room.access === 'private') {
             const password = await askPassword(player);
             if (room.password !== password) return player.sendMessage('§cWrong password.');
         }
 
         const oldRoom = ChatRoom.find(player);
-        const isOwner = room.owner.xuid === player.getXuid();
+        const isOwner = oldRoom?.owner.xuid === player.getXuid();
         const confirmation = oldRoom ? await confirmLeave(player, oldRoom, isOwner) : true;
 
         if (!confirmation) return;

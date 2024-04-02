@@ -113,7 +113,7 @@ events.playerJoin.on(({ player }) => {
     const { welcome } = config.broadcast;
     if (welcome.chat.trim().length > 0) player.sendMessage(setPlaceholders(welcome.chat, player));
     if (welcome.subtitle.trim().length > 0) player.sendSubtitle(setPlaceholders(welcome.subtitle, player));
-    if (welcome.title.trim().length > 0) player.sendMessage(setPlaceholders(welcome.title, player));
+    if (welcome.title.trim().length > 0) player.sendTitle(setPlaceholders(welcome.title, player));
     if (welcome.sound.trim().length > 0) player.playSound(welcome.sound);
 });
 

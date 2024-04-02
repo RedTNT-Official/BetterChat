@@ -4,30 +4,6 @@ import { bedrockServer } from "bdsx/launcher";
 
 const rooms = new Map<string, ChatRoom>();
 
-export function askPassword(player: ServerPlayer, creating: boolean = false): Promise<string> {
-    return new Promise((resolve) => {
-        const netID = player.getNetworkIdentifier();
-    
-        const form = new CustomForm('Create Form');
-        form.addComponent(new FormInput(`Enter the${creating ? ' new ' : ' '}room password`));
-        form.sendTo(netID, async (data) => {
-            const response: string = data.response;
-            if (/[A-z]/g.exec(response.trim())) return resolve(response);
-            resolve(await askPassword(player, creating));
-        });
-    });
-}
-
-export function confirmLeave(player: ServerPlayer, room: ChatRoom, isOwner: boolean): Promise<boolean> {
-    return new Promise((resolve) => {
-        const form = new ModalForm('Leave confirmation');
-        form.setContent(`Are you sure you want to leave the ${room.name} room?${isOwner && room.members.length === 0 ? '\n§cThis will dissolve the chat room.' : ''}`);
-        form.sendTo(player.getNetworkIdentifier(), ({ response }) => {
-            resolve(response);
-        });
-    });
-}
-
 export class ChatRoom {
     owner: RoomMember;
     name: string;
@@ -50,7 +26,7 @@ export class ChatRoom {
     }
 
     static getAll(): ChatRoom[] {
-        return Object.values(rooms);
+        return [...rooms.values()];
     }
 
     broadcast(message: string) {
@@ -89,6 +65,31 @@ export class ChatRoom {
     isValid(): boolean {
         return rooms.has(this.owner.xuid);
     }
+}
+
+export function askPassword(player: ServerPlayer, creating: boolean = false): Promise<string> {
+    return new Promise((resolve) => {
+        const netID = player.getNetworkIdentifier();
+    
+        const form = new CustomForm('Create Form');
+        form.addComponent(new FormInput(`Enter the${creating ? ' new ' : ' '}room password`));
+        form.sendTo(netID, async ({ response }) => {
+            if (!response) return;
+            
+            if (/[A-z]|[0-9]/g.exec(response[0].trim())) return resolve(response[0].trim());
+            resolve(await askPassword(player, creating));
+        });
+    });
+}
+
+export function confirmLeave(player: ServerPlayer, room: ChatRoom, isOwner: boolean): Promise<boolean> {
+    return new Promise((resolve) => {
+        const form = new ModalForm('Leave confirmation');
+        form.setContent(`Are you sure you want to leave the ${room.name} room?${isOwner && room.members.length === 0 ? '\n§cThis will dissolve the chat room.' : ''}`);
+        form.sendTo(player.getNetworkIdentifier(), ({ response }) => {
+            resolve(response);
+        });
+    });
 }
 
 function parseMember(player: ServerPlayer): RoomMember {
