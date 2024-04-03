@@ -18,7 +18,7 @@ cmd.overload((_, origin, out) => {
     rooms.forEach(r => form.addButton(new FormButton(`${r.name}\nOwner: ${r.owner.name}`)));
 
     form.sendTo(player.getNetworkIdentifier(), async ({ response }) => {
-        if (!response) return;
+        if (response === null) return;
 
         const room = rooms[response];
         if (!room.isValid()) return player.sendMessage('§cRoom no longer exists.');
